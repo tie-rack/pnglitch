@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PNGlitch</title>
+    <style>
+      body {
+        font-family: "Helvetica Neue", Helvetica, sans-serif;
+        text-align: center;
+      }
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+      }
+      .controls {
+        display: flex;
+        width: 100%;
+      }
+      .result {
+        margin-top: 1em;
+        text-align: center;
+      }
+      .result-img {
+        max-width: 100%;
+      }
+      .file-input {
+        opacity: 0;
+        width: 10px;
+      }
+      .btn {
+        background-color: #fee;
+        border-radius: 2px;
+        border: 0;
+        cursor: pointer;
+        flex-basis: 50%;
+        font-size: 16px;
+        padding: 10px;
+        text-transform: lowercase;
+      }
+      .btn:hover {
+        background-color: #fcc;
+      }
+      button:disabled:hover {
+        background-color: #fee;
+        cursor: auto;
+      }
+      .info {
+        font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="controls">
+        <label class="btn" for="png-upload">Choose a png</label>
+        <input class="file-input" type="file" id="png-upload" name="png-upload" accept=".png,image/png">
+        <button id="reglitch" class="btn" disabled="disabled">re-glitch</button>
+      </div>
+      <div class="result" id="result"></div>
+      <div class="info">
+        <p>Inspired by <a href="http://sailorhg.com/glitchy/two.html">sailorhg's Glitchy 2.0</a></p>
+        <p>Code at <a href="https://github.com/tie-rack/pnglitch">github.com/tie-rack/pnglitch</a></p>
+      </div>
+    </div>
+  </body>
+</html>
