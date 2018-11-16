@@ -1,5 +1,3 @@
-use std::ops::BitXor;
-
 #[macro_use]
 extern crate cfg_if;
 extern crate js_sys;
@@ -7,6 +5,9 @@ extern crate wasm_bindgen;
 
 extern crate png;
 use png::HasParameters;
+
+mod effects;
+use effects::Glitch;
 
 use wasm_bindgen::prelude::*;
 
@@ -36,7 +37,7 @@ fn scaled_random(max: usize) -> usize {
     (js_sys::Math::random() * (max as f64)) as usize
 }
 
-fn shift_chunk(buf: &mut [u8], line_size: usize) -> () {
+fn glitch_chunk(buf: &mut [u8], line_size: usize, color_type: png::ColorType) -> () {
     let line_count = buf.len() / line_size;
 
     let first_line = scaled_random(line_count);
@@ -48,25 +49,76 @@ fn shift_chunk(buf: &mut [u8], line_size: usize) -> () {
         first_line + chunk_size
     };
 
-    let line_shift_amount = scaled_random(line_size);
+    let line_shift = effects::LineGlitch::Shift(scaled_random(line_size));
 
     let xor_value = scaled_random(256) as u8;
 
+    let darken = js_sys::Math::random() < 0.15;
+    let lighten = js_sys::Math::random() < 0.15;
+
+    let quantize = js_sys::Math::random() < 0.2;
+
     let reverse = js_sys::Math::random() < 0.3;
+
+    let flip = js_sys::Math::random() < 0.3;
+
+    let shift_channel = if js_sys::Math::random() < 0.3 {
+        let channel_count = match color_type {
+            png::ColorType::Grayscale => 1,
+            png::ColorType::RGB => 3,
+            png::ColorType::Indexed => 1,
+            png::ColorType::GrayscaleAlpha => 2,
+            png::ColorType::RGBA => 4,
+        };
+        let amount = scaled_random(line_size) / channel_count;
+        let channel = scaled_random(channel_count);
+        Some(effects::LineGlitch::ChannelShift(
+            amount,
+            channel,
+            channel_count,
+        ))
+    } else {
+        None
+    };
+
+    {
+        let chunk_start = first_line * line_size;
+        let chunk_end = last_line * line_size;
+
+        let chunk = buf.get_mut(chunk_start..chunk_end).unwrap();
+
+        effects::ChunkGlitch::XOR(xor_value).run(chunk);
+
+        if lighten {
+            effects::ChunkGlitch::Lighten.run(chunk);
+        }
+
+        if darken {
+            effects::ChunkGlitch::Darken.run(chunk);
+        }
+
+        if quantize {
+            effects::ChunkGlitch::Quantize.run(chunk);
+        }
+
+        if flip {
+            effects::ChunkGlitch::Flip.run(chunk);
+        }
+    }
 
     for line_number in first_line..last_line {
         let line_start = line_number * line_size;
         let line_end = line_start + line_size;
 
         if let Some(line) = buf.get_mut(line_start..line_end) {
-            line.rotate_left(line_shift_amount);
-
-            for val in line.iter_mut() {
-                *val = val.bitxor(xor_value);
-            }
+            line_shift.run(line);
 
             if reverse {
-                line.reverse();
+                effects::LineGlitch::Reverse.run(line);
+            }
+
+            if let Some(shift_channel) = &shift_channel {
+                shift_channel.run(line);
             }
         }
     }
@@ -86,7 +138,7 @@ pub fn pnglitch(png: &[u8]) -> Vec<u8> {
     let glitch_count = scaled_random(5) + 1;
 
     for _ in 0..glitch_count {
-        shift_chunk(&mut buf, info.line_size);
+        glitch_chunk(&mut buf, info.line_size, info.color_type);
     }
 
     let mut out: Vec<u8> = Vec::new();
