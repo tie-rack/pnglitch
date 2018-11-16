@@ -3,7 +3,6 @@ use std::ops::BitXor;
 #[macro_use]
 extern crate cfg_if;
 extern crate js_sys;
-extern crate web_sys;
 extern crate wasm_bindgen;
 
 extern crate png;
