@@ -1,6 +1,10 @@
 # PNGlitch
 
-## Developing
+## The website
+
+Do the following in the `www` directory.
+
+### Developing
 
 * `npm run start` -- Serve the project locally for
   development at `http://localhost:8080`.

@@ -1,4 +1,4 @@
-import("../crate/pkg").then(module => {
+import("../../wasm-pnglitch/pkg").then(module => {
   let imageData;
 
   let pngSelector = document.getElementById('png-upload');

@@ -1,11 +1,11 @@
 [package]
-authors = ["The RustWasm Developers"]
+authors = ["Christopher Shea <cmshea@gmail.com>"]
 categories = ["wasm"]
-description = "My super awesome Rust, WebAssembly, and Webpack project!"
+description = "Glitch a png in wasm"
 license = "Apache-2.0/MIT"
-name = "rust-webpack"
+name = "wasm-pnglitch"
 readme = "./README.md"
-repository = "https://github.com/rustwasm/rust-webpack-template"
+repository = "https://github.com/tie-rack/pnglitch"
 version = "0.1.0"
 
 [lib]
