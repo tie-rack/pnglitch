@@ -1,15 +1,13 @@
 {
-  "author": "Nick Fitzgerald <nfitzgerald@mozilla.com>",
-  "name": "create-rust-webpack",
-  "version": "0.1.5",
-  "repository": "https://github.com/rustwasm/rust-webpack-template",
+  "author": "Christopher Shea <cmshea@gmail.com>",
+  "name": "pnglitch",
+  "version": "0.0.1",
+  "repository": "https://github.com/tie-rack/pnglitch",
   "license": "Apache-2.0/MIT",
+  "private": true,
   "scripts": {
     "start": "webpack-dev-server -d",
     "build": "webpack"
-  },
-  "bin": {
-    "create-rust-webpack": ".bin/create-rust-webpack.js"
   },
   "devDependencies": {
     "@wasm-tool/wasm-pack-plugin": "0.1.3",
