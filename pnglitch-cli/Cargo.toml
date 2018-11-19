@@ -1,0 +1,10 @@
+[package]
+name = "pnglitch-cli"
+version = "0.1.0"
+authors = ["Christopher Shea <cmshea@gmail.com>"]
+
+[dependencies]
+clap = "2.32.0"
+png = "0.13.1"
+pnglitch-core = { path = "../pnglitch-core" }
+rand = "0.6.0"
