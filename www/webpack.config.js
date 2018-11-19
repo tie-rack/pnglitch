@@ -19,7 +19,7 @@ module.exports = {
     }),
 
     new WasmPackPlugin({
-      crateDirectory: path.resolve(__dirname, "..", "wasm-pnglitch")
+      crateDirectory: path.resolve(__dirname, "..", "pnglitch-wasm")
     }),
   ]
 };

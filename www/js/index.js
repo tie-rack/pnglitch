@@ -1,4 +1,4 @@
-import("../../wasm-pnglitch/pkg").then(module => {
+import("../../pnglitch-wasm/pkg").then(module => {
   let imageData;
 
   let pngSelector = document.getElementById('png-upload');
