@@ -1,13 +1,14 @@
 #[macro_use]
 extern crate cfg_if;
 extern crate js_sys;
+extern crate pnglitch_core;
 extern crate wasm_bindgen;
+
+use pnglitch_core::effects;
+use pnglitch_core::effects::Glitch;
 
 extern crate png;
 use png::HasParameters;
-
-mod effects;
-use effects::Glitch;
 
 use wasm_bindgen::prelude::*;
 
