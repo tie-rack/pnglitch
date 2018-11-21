@@ -86,7 +86,11 @@ fn glitch_chunk(buf: &mut [u8], line_size: usize, color_type: png::ColorType) ->
     let channel_swap = if js_sys::Math::random() < 0.3 {
         let channel_1 = scaled_random(channel_count);
         let channel_2 = scaled_random(channel_count);
-        Some(effects::ChunkGlitch::ChannelSwap(channel_1, channel_2, channel_count))
+        Some(effects::ChunkGlitch::ChannelSwap(
+            channel_1,
+            channel_2,
+            channel_count,
+        ))
     } else {
         None
     };
@@ -95,27 +99,29 @@ fn glitch_chunk(buf: &mut [u8], line_size: usize, color_type: png::ColorType) ->
         let line_start = line_number * line_size;
         let line_end = line_start + line_size;
 
-        if let Some(line) = buf.get_mut(line_start..line_end) {
-            if let Some(shift_channel) = &shift_channel {
-                shift_channel.run(line);
-            }
+        let line = &mut buf[line_start..line_end];
 
-            line_shift.run(line);
+        if let Some(shift_channel) = &shift_channel {
+            shift_channel.run(line);
+        }
 
-            if reverse {
-                effects::LineGlitch::Reverse.run(line);
-            }
+        line_shift.run(line);
+
+        if reverse {
+            effects::LineGlitch::Reverse.run(line);
         }
     }
 
     let chunk_start = first_line * line_size;
     let chunk_end = last_line * line_size;
 
-    let chunk = buf.get_mut(chunk_start..chunk_end).unwrap();
+    let chunk = &mut buf[chunk_start..chunk_end];
 
     effects::ChunkGlitch::XOR(xor_value).run(chunk);
 
-    channel_swap.map(|cs| cs.run(chunk));
+    if let Some(cs) = channel_swap {
+        cs.run(chunk)
+    };
 
     if lighten {
         effects::ChunkGlitch::Lighten.run(chunk);

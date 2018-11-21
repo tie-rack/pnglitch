@@ -74,7 +74,11 @@ fn glitch_chunk(
     let channel_swap = if rng.gen_bool(0.3) {
         let channel_1 = channel_count_dist.sample(rng);
         let channel_2 = channel_count_dist.sample(rng);
-        Some(effects::ChunkGlitch::ChannelSwap(channel_1, channel_2, channel_count))
+        Some(effects::ChunkGlitch::ChannelSwap(
+            channel_1,
+            channel_2,
+            channel_count,
+        ))
     } else {
         None
     };
@@ -86,7 +90,7 @@ fn glitch_chunk(
         let line_start = line_number * line_size;
         let line_end = line_start + line_size;
 
-        let line = buf.get_mut(line_start..line_end).unwrap();
+        let line = &mut buf[line_start..line_end];
 
         if let Some(shift_channel) = &shift_channel {
             shift_channel.run(line);
@@ -103,11 +107,13 @@ fn glitch_chunk(
     let chunk_start = first_line * line_size;
     let chunk_end = last_line * line_size;
 
-    let chunk = buf.get_mut(chunk_start..chunk_end).unwrap();
+    let chunk = &mut buf[chunk_start..chunk_end];
 
     effects::ChunkGlitch::XOR(xor_value).run(chunk);
 
-    channel_swap.map(|cs| cs.run(chunk));
+    if let Some(cs) = channel_swap {
+        cs.run(chunk)
+    };
 
     if lighten {
         effects::ChunkGlitch::Lighten.run(chunk);
@@ -172,7 +178,7 @@ fn main() {
 
     let path = Path::new(output);
     let file = File::create(path).unwrap();
-    let ref mut w = BufWriter::new(file);
+    let w = &mut BufWriter::new(file);
 
     let mut encoder = png::Encoder::new(w, info.width, info.height);
     encoder.set(info.color_type).set(info.bit_depth);

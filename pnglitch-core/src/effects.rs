@@ -38,7 +38,7 @@ impl Glitch for ChunkGlitch {
             }
             ChunkGlitch::Darken => {
                 for val in chunk.iter_mut() {
-                    *val = *val / 2;
+                    *val /= 2;
                 }
             }
             ChunkGlitch::Lighten => {
