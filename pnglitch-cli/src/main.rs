@@ -70,32 +70,6 @@ fn glitch_chunk(
         None
     };
 
-    // chunk-level effects
-    {
-        let chunk_start = first_line * line_size;
-        let chunk_end = last_line * line_size;
-
-        let chunk = buf.get_mut(chunk_start..chunk_end).unwrap();
-
-        effects::ChunkGlitch::XOR(xor_value).run(chunk);
-
-        if lighten {
-            effects::ChunkGlitch::Lighten.run(chunk);
-        }
-
-        if darken {
-            effects::ChunkGlitch::Darken.run(chunk);
-        }
-
-        if quantize {
-            effects::ChunkGlitch::Quantize.run(chunk);
-        }
-
-        if flip {
-            effects::ChunkGlitch::Flip.run(chunk);
-        }
-    }
-
     let line_shift = effects::LineGlitch::Shift(line_shift_amount);
 
     // line-level effects
@@ -105,15 +79,39 @@ fn glitch_chunk(
 
         let line = buf.get_mut(line_start..line_end).unwrap();
 
+        if let Some(shift_channel) = &shift_channel {
+            shift_channel.run(line);
+        }
+
         line_shift.run(line);
 
         if reverse {
             effects::LineGlitch::Reverse.run(line);
         }
+    }
 
-        if let Some(shift_channel) = &shift_channel {
-            shift_channel.run(line);
-        }
+    // chunk-level effects
+    let chunk_start = first_line * line_size;
+    let chunk_end = last_line * line_size;
+
+    let chunk = buf.get_mut(chunk_start..chunk_end).unwrap();
+
+    effects::ChunkGlitch::XOR(xor_value).run(chunk);
+
+    if lighten {
+        effects::ChunkGlitch::Lighten.run(chunk);
+    }
+
+    if darken {
+        effects::ChunkGlitch::Darken.run(chunk);
+    }
+
+    if quantize {
+        effects::ChunkGlitch::Quantize.run(chunk);
+    }
+
+    if flip {
+        effects::ChunkGlitch::Flip.run(chunk);
     }
 }
 

@@ -82,46 +82,44 @@ fn glitch_chunk(buf: &mut [u8], line_size: usize, color_type: png::ColorType) ->
         None
     };
 
-    {
-        let chunk_start = first_line * line_size;
-        let chunk_end = last_line * line_size;
-
-        let chunk = buf.get_mut(chunk_start..chunk_end).unwrap();
-
-        effects::ChunkGlitch::XOR(xor_value).run(chunk);
-
-        if lighten {
-            effects::ChunkGlitch::Lighten.run(chunk);
-        }
-
-        if darken {
-            effects::ChunkGlitch::Darken.run(chunk);
-        }
-
-        if quantize {
-            effects::ChunkGlitch::Quantize.run(chunk);
-        }
-
-        if flip {
-            effects::ChunkGlitch::Flip.run(chunk);
-        }
-    }
-
     for line_number in first_line..last_line {
         let line_start = line_number * line_size;
         let line_end = line_start + line_size;
 
         if let Some(line) = buf.get_mut(line_start..line_end) {
+            if let Some(shift_channel) = &shift_channel {
+                shift_channel.run(line);
+            }
+
             line_shift.run(line);
 
             if reverse {
                 effects::LineGlitch::Reverse.run(line);
             }
-
-            if let Some(shift_channel) = &shift_channel {
-                shift_channel.run(line);
-            }
         }
+    }
+
+    let chunk_start = first_line * line_size;
+    let chunk_end = last_line * line_size;
+
+    let chunk = buf.get_mut(chunk_start..chunk_end).unwrap();
+
+    effects::ChunkGlitch::XOR(xor_value).run(chunk);
+
+    if lighten {
+        effects::ChunkGlitch::Lighten.run(chunk);
+    }
+
+    if darken {
+        effects::ChunkGlitch::Darken.run(chunk);
+    }
+
+    if quantize {
+        effects::ChunkGlitch::Quantize.run(chunk);
+    }
+
+    if flip {
+        effects::ChunkGlitch::Flip.run(chunk);
     }
 }
 
