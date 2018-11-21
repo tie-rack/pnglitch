@@ -41,6 +41,14 @@ fn scaled_random(max: usize) -> usize {
 fn glitch_chunk(buf: &mut [u8], line_size: usize, color_type: png::ColorType) -> () {
     let line_count = buf.len() / line_size;
 
+    let channel_count = match color_type {
+        png::ColorType::Grayscale => 1,
+        png::ColorType::RGB => 3,
+        png::ColorType::Indexed => 1,
+        png::ColorType::GrayscaleAlpha => 2,
+        png::ColorType::RGBA => 4,
+    };
+
     let first_line = scaled_random(line_count);
     let chunk_size = scaled_random(line_count / 2);
 
@@ -64,13 +72,6 @@ fn glitch_chunk(buf: &mut [u8], line_size: usize, color_type: png::ColorType) ->
     let flip = js_sys::Math::random() < 0.3;
 
     let shift_channel = if js_sys::Math::random() < 0.3 {
-        let channel_count = match color_type {
-            png::ColorType::Grayscale => 1,
-            png::ColorType::RGB => 3,
-            png::ColorType::Indexed => 1,
-            png::ColorType::GrayscaleAlpha => 2,
-            png::ColorType::RGBA => 4,
-        };
         let amount = scaled_random(line_size) / channel_count;
         let channel = scaled_random(channel_count);
         Some(effects::LineGlitch::ChannelShift(
@@ -78,6 +79,14 @@ fn glitch_chunk(buf: &mut [u8], line_size: usize, color_type: png::ColorType) ->
             channel,
             channel_count,
         ))
+    } else {
+        None
+    };
+
+    let channel_swap = if js_sys::Math::random() < 0.3 {
+        let channel_1 = scaled_random(channel_count);
+        let channel_2 = scaled_random(channel_count);
+        Some(effects::ChunkGlitch::ChannelSwap(channel_1, channel_2, channel_count))
     } else {
         None
     };
@@ -105,6 +114,8 @@ fn glitch_chunk(buf: &mut [u8], line_size: usize, color_type: png::ColorType) ->
     let chunk = buf.get_mut(chunk_start..chunk_end).unwrap();
 
     effects::ChunkGlitch::XOR(xor_value).run(chunk);
+
+    channel_swap.map(|cs| cs.run(chunk));
 
     if lighten {
         effects::ChunkGlitch::Lighten.run(chunk);

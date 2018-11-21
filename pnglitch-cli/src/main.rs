@@ -25,10 +25,18 @@ fn glitch_chunk(
     rng: &mut ThreadRng,
 ) -> () {
     let line_count = buf.len() / line_size;
+    let channel_count = match color_type {
+        png::ColorType::Grayscale => 1,
+        png::ColorType::RGB => 3,
+        png::ColorType::Indexed => 1,
+        png::ColorType::GrayscaleAlpha => 2,
+        png::ColorType::RGBA => 4,
+    };
 
     let line_number_dist = Uniform::from(0..line_count);
     let line_shift_dist = Uniform::from(0..line_size);
     let xor_dist = Uniform::from(0..255);
+    let channel_count_dist = Uniform::from(0..channel_count);
 
     let first_line = line_number_dist.sample(rng);
     let chunk_size = line_number_dist.sample(rng) / 2;
@@ -52,20 +60,21 @@ fn glitch_chunk(
     let flip = rng.gen_bool(0.2);
 
     let shift_channel = if rng.gen_bool(0.3) {
-        let channel_count = match color_type {
-            png::ColorType::Grayscale => 1,
-            png::ColorType::RGB => 3,
-            png::ColorType::Indexed => 1,
-            png::ColorType::GrayscaleAlpha => 2,
-            png::ColorType::RGBA => 4,
-        };
         let amount = line_shift_dist.sample(rng) / channel_count;
-        let channel = Uniform::from(0..channel_count).sample(rng);
+        let channel = channel_count_dist.sample(rng);
         Some(effects::LineGlitch::ChannelShift(
             amount,
             channel,
             channel_count,
         ))
+    } else {
+        None
+    };
+
+    let channel_swap = if rng.gen_bool(0.3) {
+        let channel_1 = channel_count_dist.sample(rng);
+        let channel_2 = channel_count_dist.sample(rng);
+        Some(effects::ChunkGlitch::ChannelSwap(channel_1, channel_2, channel_count))
     } else {
         None
     };
@@ -97,6 +106,8 @@ fn glitch_chunk(
     let chunk = buf.get_mut(chunk_start..chunk_end).unwrap();
 
     effects::ChunkGlitch::XOR(xor_value).run(chunk);
+
+    channel_swap.map(|cs| cs.run(chunk));
 
     if lighten {
         effects::ChunkGlitch::Lighten.run(chunk);
