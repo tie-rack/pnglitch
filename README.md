@@ -2,7 +2,7 @@
 
 ## The website
 
-Do the following in the `www` directory.
+Do the following in the `pnglitch-web` directory.
 
 ### Developing
 
