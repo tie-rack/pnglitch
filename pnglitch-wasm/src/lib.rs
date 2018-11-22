@@ -1,14 +1,18 @@
 #[macro_use]
 extern crate cfg_if;
 extern crate js_sys;
-extern crate pnglitch_core;
 extern crate wasm_bindgen;
 
-use pnglitch_core::effects;
-use pnglitch_core::effects::Glitch;
+extern crate pnglitch_core;
+use pnglitch_core::{glitch, GlitchOptions};
 
 extern crate png;
 use png::HasParameters;
+
+extern crate rand;
+use rand::SeedableRng;
+
+extern crate rand_hc;
 
 use wasm_bindgen::prelude::*;
 
@@ -34,112 +38,6 @@ cfg_if! {
     }
 }
 
-fn scaled_random(max: usize) -> usize {
-    (js_sys::Math::random() * (max as f64)) as usize
-}
-
-fn glitch_chunk(buf: &mut [u8], line_size: usize, color_type: png::ColorType) -> () {
-    let line_count = buf.len() / line_size;
-
-    let channel_count = match color_type {
-        png::ColorType::Grayscale => 1,
-        png::ColorType::RGB => 3,
-        png::ColorType::Indexed => 1,
-        png::ColorType::GrayscaleAlpha => 2,
-        png::ColorType::RGBA => 4,
-    };
-
-    let first_line = scaled_random(line_count);
-    let chunk_size = scaled_random(line_count / 2);
-
-    let last_line = if (first_line + chunk_size) > line_count {
-        line_count
-    } else {
-        first_line + chunk_size
-    };
-
-    let line_shift = effects::LineGlitch::Shift(scaled_random(line_size));
-
-    let xor_value = scaled_random(256) as u8;
-
-    let darken = js_sys::Math::random() < 0.15;
-    let lighten = js_sys::Math::random() < 0.15;
-
-    let quantize = js_sys::Math::random() < 0.2;
-
-    let reverse = js_sys::Math::random() < 0.3;
-
-    let flip = js_sys::Math::random() < 0.3;
-
-    let shift_channel = if js_sys::Math::random() < 0.3 {
-        let amount = scaled_random(line_size) / channel_count;
-        let channel = scaled_random(channel_count);
-        Some(effects::LineGlitch::ChannelShift(
-            amount,
-            channel,
-            channel_count,
-        ))
-    } else {
-        None
-    };
-
-    let channel_swap = if js_sys::Math::random() < 0.3 {
-        let channel_1 = scaled_random(channel_count);
-        let channel_2 = scaled_random(channel_count);
-        Some(effects::ChunkGlitch::ChannelSwap(
-            channel_1,
-            channel_2,
-            channel_count,
-        ))
-    } else {
-        None
-    };
-
-    for line_number in first_line..last_line {
-        let line_start = line_number * line_size;
-        let line_end = line_start + line_size;
-
-        let line = &mut buf[line_start..line_end];
-
-        if let Some(shift_channel) = &shift_channel {
-            shift_channel.run(line);
-        }
-
-        line_shift.run(line);
-
-        if reverse {
-            effects::LineGlitch::Reverse.run(line);
-        }
-    }
-
-    let chunk_start = first_line * line_size;
-    let chunk_end = last_line * line_size;
-
-    let chunk = &mut buf[chunk_start..chunk_end];
-
-    effects::ChunkGlitch::XOR(xor_value).run(chunk);
-
-    if let Some(cs) = channel_swap {
-        cs.run(chunk)
-    };
-
-    if lighten {
-        effects::ChunkGlitch::Lighten.run(chunk);
-    }
-
-    if darken {
-        effects::ChunkGlitch::Darken.run(chunk);
-    }
-
-    if quantize {
-        effects::ChunkGlitch::Quantize.run(chunk);
-    }
-
-    if flip {
-        effects::ChunkGlitch::Flip.run(chunk);
-    }
-}
-
 #[wasm_bindgen]
 pub fn pnglitch(png: &[u8]) -> Vec<u8> {
     set_panic_hook();
@@ -151,13 +49,17 @@ pub fn pnglitch(png: &[u8]) -> Vec<u8> {
     let mut buf = vec![0; info.buffer_size()];
     reader.next_frame(&mut buf).unwrap();
 
-    let glitch_count = scaled_random(5) + 1;
-
-    for _ in 0..glitch_count {
-        glitch_chunk(&mut buf, info.line_size, info.color_type);
-    }
-
     let mut out: Vec<u8> = Vec::new();
+
+    let options = GlitchOptions {
+        min_glitches: 2,
+        max_glitches: 6,
+    };
+
+    let seed = (js_sys::Math::random() * (u64::max_value() as f64)) as u64;
+    let mut rng = rand_hc::Hc128Rng::seed_from_u64(seed);
+
+    glitch(&info, &mut buf, &mut rng, &options);
 
     {
         let mut encoder = png::Encoder::new(&mut out, info.width, info.height);
