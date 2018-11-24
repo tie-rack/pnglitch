@@ -14,11 +14,26 @@
         margin: 0 auto;
       }
       .controls {
-        display: flex;
         width: 100%;
+        display: flex
+      }
+      .glitch-control {
+        display: flex;
+      }
+      .flex-50 {
+        flex-basis: 50%;
+      }
+      .text-right {
+        text-align: right;
+      }
+      .text-left {
+        text-align: left;
+      }
+      .label {
+        padding-left: 1em;
       }
       .result {
-        margin-top: 1em;
+        margin: 1em 0;
         text-align: center;
       }
       .result-img {
@@ -71,6 +86,8 @@
       <div class="result">
         <div id="error" class="error hidden"></div>
         <img id="result-img" class="result-img" />
+      </div>
+      <div id="glitch-controls" class="glitch-controls">
       </div>
       <div class="info">
         <p>Inspired by <a href="http://sailorhg.com/glitchy/two.html">sailorhg's Glitchy 2.0</a></p>

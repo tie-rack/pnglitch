@@ -39,7 +39,91 @@ cfg_if! {
 }
 
 #[wasm_bindgen]
-pub fn pnglitch(png: &[u8]) -> Result<Vec<u8>, JsValue> {
+pub struct Options(GlitchOptions);
+
+#[wasm_bindgen]
+impl Options {
+    pub fn default() -> Options {
+        Options(GlitchOptions::default())
+    }
+
+    pub fn set_min_glitches(&mut self, n: u32) -> () {
+        self.0.min_glitches = n;
+    }
+    pub fn set_max_glitches(&mut self, n: u32) -> () {
+        self.0.max_glitches = n;
+    }
+    pub fn set_channel_swap_chance(&mut self, chance: f64) -> () {
+        self.0.channel_swap_chance = chance;
+    }
+    pub fn set_darken_chance(&mut self, chance: f64) -> () {
+        self.0.darken_chance = chance;
+    }
+    pub fn set_flip_chance(&mut self, chance: f64) -> () {
+        self.0.flip_chance = chance;
+    }
+    pub fn set_lighten_chance(&mut self, chance: f64) -> () {
+        self.0.lighten_chance = chance;
+    }
+    pub fn set_line_shift_chance(&mut self, chance: f64) -> () {
+        self.0.line_shift_chance = chance;
+    }
+    pub fn set_off_by_one_chance(&mut self, chance: f64) -> () {
+        self.0.off_by_one_chance = chance;
+    }
+    pub fn set_quantize_chance(&mut self, chance: f64) -> () {
+        self.0.quantize_chance = chance;
+    }
+    pub fn set_reverse_chance(&mut self, chance: f64) -> () {
+        self.0.reverse_chance = chance;
+    }
+    pub fn set_shift_channel_chance(&mut self, chance: f64) -> () {
+        self.0.shift_channel_chance = chance;
+    }
+    pub fn set_xor_chance(&mut self, chance: f64) -> () {
+        self.0.xor_chance = chance;
+    }
+
+    pub fn min_glitches(&self) -> u32 {
+        self.0.min_glitches
+    }
+    pub fn max_glitches(&self) -> u32 {
+        self.0.max_glitches
+    }
+    pub fn channel_swap_chance(&self) -> f64 {
+        self.0.channel_swap_chance
+    }
+    pub fn darken_chance(&self) -> f64 {
+        self.0.darken_chance
+    }
+    pub fn flip_chance(&self) -> f64 {
+        self.0.flip_chance
+    }
+    pub fn lighten_chance(&self) -> f64 {
+        self.0.lighten_chance
+    }
+    pub fn line_shift_chance(&self) -> f64 {
+        self.0.line_shift_chance
+    }
+    pub fn off_by_one_chance(&self) -> f64 {
+        self.0.off_by_one_chance
+    }
+    pub fn quantize_chance(&self) -> f64 {
+        self.0.quantize_chance
+    }
+    pub fn reverse_chance(&self) -> f64 {
+        self.0.reverse_chance
+    }
+    pub fn shift_channel_chance(&self) -> f64 {
+        self.0.shift_channel_chance
+    }
+    pub fn xor_chance(&self) -> f64 {
+        self.0.xor_chance
+    }
+}
+
+#[wasm_bindgen]
+pub fn pnglitch(png: &[u8], options: &Options) -> Result<Vec<u8>, JsValue> {
     set_panic_hook();
 
     let decoder = png::Decoder::new(png);
@@ -55,12 +139,10 @@ pub fn pnglitch(png: &[u8]) -> Result<Vec<u8>, JsValue> {
 
     let mut out: Vec<u8> = Vec::new();
 
-    let options = GlitchOptions::default();
-
     let seed = (js_sys::Math::random() * (u64::max_value() as f64)) as u64;
     let mut rng = rand_hc::Hc128Rng::seed_from_u64(seed);
 
-    glitch(&info, &mut buf, &mut rng, &options);
+    glitch(&info, &mut buf, &mut rng, &options.0);
 
     {
         let mut encoder = png::Encoder::new(&mut out, info.width, info.height);
