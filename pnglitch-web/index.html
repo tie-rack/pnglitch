@@ -45,6 +45,14 @@
         background-color: #fee;
         cursor: auto;
       }
+      .disabled {
+        background-color: #fee;
+        color: #7f7f7f;
+      }
+      .disabled:hover {
+        background-color: #fee;
+        cursor: auto;
+      }
       .info {
         font-size: 12px;
       }
@@ -53,7 +61,7 @@
   <body>
     <div class="container">
       <div class="controls">
-        <label class="btn" for="png-upload">Choose a png</label>
+        <label id="png-upload-label" class="btn disabled" for="png-upload">Choose a png</label>
         <input class="file-input" type="file" id="png-upload" name="png-upload" accept=".png,image/png">
         <button id="reglitch" class="btn" disabled="disabled">re-glitch</button>
       </div>

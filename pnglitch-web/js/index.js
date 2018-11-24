@@ -1,6 +1,7 @@
 import("../../pnglitch-wasm/pkg").then(module => {
   let imageData;
 
+  let pngSelectorLabel = document.getElementById('png-upload-label');
   let pngSelector = document.getElementById('png-upload');
   let resultImg = document.getElementById('result-img');
   let reglitch = document.getElementById('reglitch');
@@ -33,4 +34,6 @@ import("../../pnglitch-wasm/pkg").then(module => {
       reader.readAsArrayBuffer(file);
     }
   });
+
+  pngSelectorLabel.classList.remove('disabled');
 });
