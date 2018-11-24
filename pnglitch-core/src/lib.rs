@@ -10,13 +10,31 @@ use rand::Rng;
 pub struct GlitchOptions {
     pub min_glitches: u32,
     pub max_glitches: u32,
+    pub channel_swap_chance: f64,
+    pub darken_chance: f64,
+    pub flip_chance: f64,
+    pub lighten_chance: f64,
+    pub line_shift_chance: f64,
+    pub quantize_chance: f64,
+    pub reverse_chance: f64,
+    pub shift_channel_chance: f64,
+    pub xor_chance: f64,
 }
 
 impl Default for GlitchOptions {
     fn default() -> GlitchOptions {
         GlitchOptions {
             min_glitches: 1,
-            max_glitches: 5,
+            max_glitches: 6,
+            channel_swap_chance: 0.3,
+            darken_chance: 0.15,
+            flip_chance: 0.2,
+            lighten_chance: 0.15,
+            line_shift_chance: 0.9,
+            quantize_chance: 0.2,
+            reverse_chance: 0.3,
+            shift_channel_chance: 0.3,
+            xor_chance: 0.8,
         }
     }
 }
@@ -32,11 +50,16 @@ pub fn glitch(
     let glitch_count = chunk_count_dist.sample(rng);
 
     for _ in 0..glitch_count {
-        glitch_chunk(&png_info, pixel_buf, rng);
+        glitch_chunk(&png_info, pixel_buf, rng, options);
     }
 }
 
-fn glitch_chunk(png_info: &png::OutputInfo, pixel_buf: &mut [u8], rng: &mut impl Rng) -> () {
+fn glitch_chunk(
+    png_info: &png::OutputInfo,
+    pixel_buf: &mut [u8],
+    rng: &mut impl Rng,
+    options: &GlitchOptions,
+) -> () {
     let line_count = pixel_buf.len() / png_info.line_size;
     let channel_count = match png_info.color_type {
         png::ColorType::Grayscale => 1,
@@ -46,9 +69,8 @@ fn glitch_chunk(png_info: &png::OutputInfo, pixel_buf: &mut [u8], rng: &mut impl
         png::ColorType::RGBA => 4,
     };
 
-    let line_number_dist = Uniform::from(0..line_count);
     let line_shift_dist = Uniform::from(0..png_info.line_size);
-    let xor_dist = Uniform::from(0..255);
+    let line_number_dist = Uniform::from(0..line_count);
     let channel_count_dist = Uniform::from(0..channel_count);
 
     let first_line = line_number_dist.sample(rng);
@@ -59,20 +81,16 @@ fn glitch_chunk(png_info: &png::OutputInfo, pixel_buf: &mut [u8], rng: &mut impl
         first_line + chunk_size
     };
 
-    let line_shift_amount = line_shift_dist.sample(rng);
+    let reverse = rng.gen_bool(options.reverse_chance);
 
-    let xor_value = xor_dist.sample(rng);
+    let lighten = rng.gen_bool(options.lighten_chance);
+    let darken = rng.gen_bool(options.darken_chance);
 
-    let reverse = rng.gen_bool(0.3);
+    let quantize = rng.gen_bool(options.quantize_chance);
 
-    let lighten = rng.gen_bool(0.15);
-    let darken = rng.gen_bool(0.15);
+    let flip = rng.gen_bool(options.flip_chance);
 
-    let quantize = rng.gen_bool(0.2);
-
-    let flip = rng.gen_bool(0.2);
-
-    let shift_channel = if rng.gen_bool(0.3) {
+    let shift_channel = if rng.gen_bool(options.shift_channel_chance) {
         let amount = line_shift_dist.sample(rng) / channel_count;
         let channel = channel_count_dist.sample(rng);
         Some(effects::LineGlitch::ChannelShift(
@@ -84,7 +102,7 @@ fn glitch_chunk(png_info: &png::OutputInfo, pixel_buf: &mut [u8], rng: &mut impl
         None
     };
 
-    let channel_swap = if rng.gen_bool(0.3) {
+    let channel_swap = if rng.gen_bool(options.channel_swap_chance) {
         let channel_1 = channel_count_dist.sample(rng);
         let channel_2 = channel_count_dist.sample(rng);
         Some(effects::ChunkGlitch::ChannelSwap(
@@ -96,7 +114,13 @@ fn glitch_chunk(png_info: &png::OutputInfo, pixel_buf: &mut [u8], rng: &mut impl
         None
     };
 
-    let line_shift = effects::LineGlitch::Shift(line_shift_amount);
+    let line_shift = if rng.gen_bool(options.line_shift_chance) {
+        let line_shift_amount = line_shift_dist.sample(rng);
+
+        Some(effects::LineGlitch::Shift(line_shift_amount))
+    } else {
+        None
+    };
 
     // line-level effects
     for line_number in first_line..last_line {
@@ -109,7 +133,9 @@ fn glitch_chunk(png_info: &png::OutputInfo, pixel_buf: &mut [u8], rng: &mut impl
             shift_channel.run(line);
         }
 
-        line_shift.run(line);
+        if let Some(ls) = &line_shift {
+            ls.run(line);
+        }
 
         if reverse {
             effects::LineGlitch::Reverse.run(line);
@@ -122,7 +148,12 @@ fn glitch_chunk(png_info: &png::OutputInfo, pixel_buf: &mut [u8], rng: &mut impl
 
     let chunk = &mut pixel_buf[chunk_start..chunk_end];
 
-    effects::ChunkGlitch::XOR(xor_value).run(chunk);
+    if rng.gen_bool(options.xor_chance) {
+        let xor_dist = Uniform::from(0..255);
+        let xor_value = xor_dist.sample(rng);
+
+        effects::ChunkGlitch::XOR(xor_value).run(chunk);
+    }
 
     if let Some(cs) = channel_swap {
         cs.run(chunk)

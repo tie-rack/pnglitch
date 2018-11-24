@@ -51,10 +51,7 @@ pub fn pnglitch(png: &[u8]) -> Vec<u8> {
 
     let mut out: Vec<u8> = Vec::new();
 
-    let options = GlitchOptions {
-        min_glitches: 2,
-        max_glitches: 6,
-    };
+    let options = GlitchOptions::default();
 
     let seed = (js_sys::Math::random() * (u64::max_value() as f64)) as u64;
     let mut rng = rand_hc::Hc128Rng::seed_from_u64(seed);
