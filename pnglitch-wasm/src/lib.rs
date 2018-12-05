@@ -39,15 +39,15 @@ cfg_if! {
 }
 
 #[wasm_bindgen]
-pub fn pnglitch(png: &[u8]) -> Vec<u8> {
+pub fn pnglitch(png: &[u8]) -> Result<Vec<u8>, JsValue> {
     set_panic_hook();
 
     let decoder = png::Decoder::new(png);
 
-    let (info, mut reader) = decoder.read_info().unwrap();
+    let (info, mut reader) = decoder.read_info().map_err(|e| JsValue::from(e.to_string()))?;
 
     let mut buf = vec![0; info.buffer_size()];
-    reader.next_frame(&mut buf).unwrap();
+    reader.next_frame(&mut buf).map_err(|e| JsValue::from(e.to_string()))?;
 
     let mut out: Vec<u8> = Vec::new();
 
@@ -61,10 +61,10 @@ pub fn pnglitch(png: &[u8]) -> Vec<u8> {
     {
         let mut encoder = png::Encoder::new(&mut out, info.width, info.height);
         encoder.set(info.color_type).set(info.bit_depth);
-        let mut writer = encoder.write_header().unwrap();
+        let mut writer = encoder.write_header().map_err(|e| JsValue::from(e.to_string()))?;
 
-        writer.write_image_data(&buf).unwrap();
+        writer.write_image_data(&buf).map_err(|e| JsValue::from(e.to_string()))?;
     }
 
-    out
+    Ok(out)
 }

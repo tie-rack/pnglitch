@@ -56,6 +56,9 @@
       .info {
         font-size: 12px;
       }
+      .hidden {
+        display: none;
+      }
     </style>
   </head>
   <body>
@@ -66,6 +69,7 @@
         <button id="reglitch" class="btn" disabled="disabled">re-glitch</button>
       </div>
       <div class="result">
+        <div id="error" class="error hidden"></div>
         <img id="result-img" class="result-img" />
       </div>
       <div class="info">
