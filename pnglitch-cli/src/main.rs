@@ -27,12 +27,14 @@ fn main() {
                 .help("Sets the input file to use")
                 .required(true)
                 .index(1),
-        ).arg(
+        )
+        .arg(
             Arg::with_name("OUTPUT")
                 .help("Sets the output file")
                 .required(true)
                 .index(2),
-        ).arg(
+        )
+        .arg(
             Arg::with_name("MIN_GLITCHES")
                 .short("m")
                 .long("min")
@@ -40,8 +42,10 @@ fn main() {
                 .help(&format!(
                     "Minimum number of glitched chunks (default: {})",
                     glitch_options_default.min_glitches
-                )).takes_value(true),
-        ).arg(
+                ))
+                .takes_value(true),
+        )
+        .arg(
             Arg::with_name("MAX_GLITCHES")
                 .short("M")
                 .long("max")
@@ -49,80 +53,100 @@ fn main() {
                 .help(&format!(
                     "Maximum number of glitched chunks (default: {})",
                     glitch_options_default.max_glitches
-                )).takes_value(true),
-        ).arg(
+                ))
+                .takes_value(true),
+        )
+        .arg(
             Arg::with_name("CHANNEL_SWAP_CHANCE")
                 .long("channel-swap")
                 .value_name("CHANCE")
                 .help(&format!(
                     "Chance of swapping channels (default {})",
                     glitch_options_default.channel_swap_chance
-                )).takes_value(true),
-        ).arg(
+                ))
+                .takes_value(true),
+        )
+        .arg(
             Arg::with_name("DARKEN_CHANCE")
                 .long("darken")
                 .value_name("CHANCE")
                 .help(&format!(
                     "Chance of darkening chunk (default {})",
                     glitch_options_default.darken_chance
-                )).takes_value(true),
-        ).arg(
+                ))
+                .takes_value(true),
+        )
+        .arg(
             Arg::with_name("FLIP_CHANCE")
                 .long("flip")
                 .value_name("CHANCE")
                 .help(&format!(
                     "Chance of flipping a chunk (default {})",
                     glitch_options_default.flip_chance
-                )).takes_value(true),
-        ).arg(
+                ))
+                .takes_value(true),
+        )
+        .arg(
             Arg::with_name("LIGHTEN_CHANCE")
                 .long("lighten")
                 .value_name("CHANCE")
                 .help(&format!(
                     "Chance of lightening a chunk (default {})",
                     glitch_options_default.lighten_chance
-                )).takes_value(true),
-        ).arg(
+                ))
+                .takes_value(true),
+        )
+        .arg(
             Arg::with_name("LINE_SHIFT_CHANCE")
                 .long("line-shift")
                 .value_name("CHANCE")
                 .help(&format!(
                     "Chance of shifting lines (default {})",
                     glitch_options_default.line_shift_chance
-                )).takes_value(true),
-        ).arg(
+                ))
+                .takes_value(true),
+        )
+        .arg(
             Arg::with_name("QUANTIZE_CHANCE")
                 .long("quantize")
                 .value_name("CHANCE")
                 .help(&format!(
                     "Chance of quantizing a chunk (default {})",
                     glitch_options_default.quantize_chance
-                )).takes_value(true),
-        ).arg(
+                ))
+                .takes_value(true),
+        )
+        .arg(
             Arg::with_name("REVERSE_CHANCE")
                 .long("reverse")
                 .value_name("CHANCE")
                 .help(&format!(
                     "Chance of reversing a chunk (default {})",
                     glitch_options_default.reverse_chance
-                )).takes_value(true),
-        ).arg(
+                ))
+                .takes_value(true),
+        )
+        .arg(
             Arg::with_name("SHIFT_CHANNEL_CHANCE")
                 .long("shift-channel")
                 .value_name("CHANCE")
                 .help(&format!(
                     "Chance of shifting a channel in a chunk (default {})",
                     glitch_options_default.shift_channel_chance
-                )).takes_value(true),
-        ).arg(
+                ))
+                .takes_value(true),
+        )
+        .arg(
             Arg::with_name("XOR_CHANCE")
                 .long("xor")
                 .value_name("CHANCE")
                 .help(&format!(
                     "Chance of xoring a chunk (default {})",
                     glitch_options_default.xor_chance
-                )).takes_value(true),
-        ).get_matches();
+                ))
+                .takes_value(true),
+        )
+        .get_matches();
 
     let input = matches.value_of("INPUT").unwrap();
     let output = matches.value_of("OUTPUT").unwrap();
