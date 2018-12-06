@@ -20,7 +20,7 @@ pub enum LineGlitch {
 }
 
 impl Glitch for ChunkGlitch {
-    fn run(&self, chunk: &mut [u8]) -> () {
+    fn run(&self, chunk: &mut [u8]) {
         match self {
             ChunkGlitch::ChannelSwap(channel_1, channel_2, channel_count) => {
                 let chunk_length = chunk.len();
@@ -64,7 +64,7 @@ impl Glitch for ChunkGlitch {
 }
 
 impl Glitch for LineGlitch {
-    fn run(&self, line: &mut [u8]) -> () {
+    fn run(&self, line: &mut [u8]) {
         match self {
             LineGlitch::ChannelShift(amount, channel, channel_count) => {
                 let line_length = line.len();

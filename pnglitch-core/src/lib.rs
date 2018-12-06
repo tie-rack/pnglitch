@@ -44,7 +44,7 @@ pub fn glitch(
     pixel_buf: &mut [u8],
     rng: &mut impl Rng,
     options: &GlitchOptions,
-) -> () {
+) {
     let chunk_count_dist = Uniform::from(options.min_glitches..=options.max_glitches);
 
     let glitch_count = chunk_count_dist.sample(rng);
@@ -59,7 +59,7 @@ fn glitch_chunk(
     pixel_buf: &mut [u8],
     rng: &mut impl Rng,
     options: &GlitchOptions,
-) -> () {
+) {
     let line_count = pixel_buf.len() / png_info.line_size;
     let channel_count = match png_info.color_type {
         png::ColorType::Grayscale => 1,
