@@ -107,6 +107,16 @@ fn main() {
                 .takes_value(true),
         )
         .arg(
+            Arg::with_name("OFF_BY_ONE_CHANCE")
+                .long("off-by-one")
+                .value_name("CHANCE")
+                .help(&format!(
+                    "Chance of shifting lines bit by bit (default {})",
+                    glitch_options_default.off_by_one_chance
+                ))
+                .takes_value(true),
+        )
+        .arg(
             Arg::with_name("QUANTIZE_CHANCE")
                 .long("quantize")
                 .value_name("CHANCE")
@@ -166,6 +176,8 @@ fn main() {
         value_t!(matches, "LIGHTEN_CHANCE", f64).unwrap_or(glitch_options_default.lighten_chance);
     let line_shift_chance = value_t!(matches, "LINE_SHIFT_CHANCE", f64)
         .unwrap_or(glitch_options_default.line_shift_chance);
+    let off_by_one_chance = value_t!(matches, "OFF_BY_ONE_CHANCE", f64)
+        .unwrap_or(glitch_options_default.off_by_one_chance);
     let quantize_chance =
         value_t!(matches, "QUANTIZE_CHANCE", f64).unwrap_or(glitch_options_default.quantize_chance);
     let reverse_chance =
@@ -200,6 +212,7 @@ fn main() {
         flip_chance,
         lighten_chance,
         line_shift_chance,
+        off_by_one_chance,
         quantize_chance,
         reverse_chance,
         shift_channel_chance,

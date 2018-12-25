@@ -15,6 +15,7 @@ pub struct GlitchOptions {
     pub flip_chance: f64,
     pub lighten_chance: f64,
     pub line_shift_chance: f64,
+    pub off_by_one_chance: f64,
     pub quantize_chance: f64,
     pub reverse_chance: f64,
     pub shift_channel_chance: f64,
@@ -31,6 +32,7 @@ impl Default for GlitchOptions {
             flip_chance: 0.2,
             lighten_chance: 0.15,
             line_shift_chance: 0.9,
+            off_by_one_chance: 0.2,
             quantize_chance: 0.2,
             reverse_chance: 0.3,
             shift_channel_chance: 0.3,
@@ -85,6 +87,8 @@ fn glitch_chunk(
 
     let lighten = rng.gen_bool(options.lighten_chance);
     let darken = rng.gen_bool(options.darken_chance);
+
+    let off_by_one = rng.gen_bool(options.off_by_one_chance);
 
     let quantize = rng.gen_bool(options.quantize_chance);
 
@@ -165,6 +169,11 @@ fn glitch_chunk(
 
     if darken {
         effects::ChunkGlitch::Darken.run(chunk);
+    }
+
+    if off_by_one {
+        effects::ChunkGlitch::OffByOne(last_line - first_line, png_info.line_size, channel_count)
+            .run(chunk);
     }
 
     if quantize {

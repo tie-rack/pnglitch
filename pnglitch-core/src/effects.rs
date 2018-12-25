@@ -9,6 +9,7 @@ pub enum ChunkGlitch {
     Darken,
     Lighten,
     Flip,
+    OffByOne(usize, usize, usize),
     Quantize,
     XOR(u8),
 }
@@ -48,6 +49,13 @@ impl Glitch for ChunkGlitch {
             }
             ChunkGlitch::Flip => {
                 chunk.reverse();
+            }
+            ChunkGlitch::OffByOne(line_count, line_length, channel_count) => {
+                for i in 0..*line_count {
+                    let line_start = i * line_length;
+                    let line_end = (i + 1) * line_length - 1;
+                    chunk[line_start..line_end].rotate_left((i * channel_count) % line_length);
+                }
             }
             ChunkGlitch::Quantize => {
                 for val in chunk.iter_mut() {
