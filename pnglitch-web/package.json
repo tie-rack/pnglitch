@@ -7,7 +7,7 @@
   "private": true,
   "scripts": {
     "start": "webpack-dev-server -d",
-    "clean": "rm -r dist",
+    "clean": "rm -rf dist",
     "build": "webpack"
   },
   "devDependencies": {
