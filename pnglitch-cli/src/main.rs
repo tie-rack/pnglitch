@@ -18,10 +18,10 @@ use pnglitch_core::{glitch, GlitchOptions};
 fn main() {
     let glitch_options_default = GlitchOptions::default();
 
-    let matches = App::new("glifch")
+    let matches = App::new("pnglitch")
         .version("1.0")
         .author("Christopher Shea <cmshea@gmail.com>")
-        .about("PNG -> Glitched GIF")
+        .about("PNG -> Glitched PNG")
         .arg(
             Arg::with_name("INPUT")
                 .help("Sets the input file to use")
