@@ -1,7 +1,7 @@
 use std::ops::BitXor;
 
 pub trait Glitch {
-    fn run(&self, &mut [u8]) -> ();
+    fn run(&self, &mut [u8]);
 }
 
 pub enum ChunkGlitch {
