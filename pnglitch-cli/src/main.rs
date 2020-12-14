@@ -7,7 +7,6 @@ extern crate clap;
 use clap::{App, Arg};
 
 extern crate png;
-use png::HasParameters;
 
 extern crate rand;
 use rand::thread_rng;
@@ -199,7 +198,8 @@ fn main() {
     let w = &mut BufWriter::new(file);
 
     let mut encoder = png::Encoder::new(w, info.width, info.height);
-    encoder.set(info.color_type).set(info.bit_depth);
+    encoder.set_color(info.color_type);
+    encoder.set_depth(info.bit_depth);
     let mut writer = encoder.write_header().unwrap();
 
     let mut rng = thread_rng();

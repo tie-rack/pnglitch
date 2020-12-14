@@ -7,7 +7,6 @@ extern crate pnglitch_core;
 use pnglitch_core::{glitch, GlitchOptions};
 
 extern crate png;
-use png::HasParameters;
 
 extern crate rand;
 use rand::SeedableRng;
@@ -146,7 +145,8 @@ pub fn pnglitch(png: &[u8], options: &Options) -> Result<Vec<u8>, JsValue> {
 
     {
         let mut encoder = png::Encoder::new(&mut out, info.width, info.height);
-        encoder.set(info.color_type).set(info.bit_depth);
+        encoder.set_color(info.color_type);
+	encoder.set_depth(info.bit_depth);
         let mut writer = encoder
             .write_header()
             .map_err(|e| JsValue::from(e.to_string()))?;
