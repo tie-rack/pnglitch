@@ -1,6 +1,5 @@
 #[macro_use]
 extern crate cfg_if;
-extern crate js_sys;
 extern crate wasm_bindgen;
 
 extern crate pnglitch_core;
@@ -9,9 +8,7 @@ use pnglitch_core::{glitch, GlitchOptions};
 extern crate png;
 
 extern crate rand;
-use rand::SeedableRng;
-
-extern crate rand_hc;
+use rand::thread_rng;
 
 use wasm_bindgen::prelude::*;
 
@@ -138,8 +135,7 @@ pub fn pnglitch(png: &[u8], options: &Options) -> Result<Vec<u8>, JsValue> {
 
     let mut out: Vec<u8> = Vec::new();
 
-    let seed = (js_sys::Math::random() * (u64::max_value() as f64)) as u64;
-    let mut rng = rand_hc::Hc128Rng::seed_from_u64(seed);
+    let mut rng = thread_rng();
 
     glitch(&info, &mut buf, &mut rng, &options.0);
 

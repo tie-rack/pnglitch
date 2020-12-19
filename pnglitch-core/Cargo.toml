@@ -5,4 +5,4 @@ authors = ["Christopher Shea <cmshea@gmail.com>"]
 
 [dependencies]
 png = "0.16.8"
-rand = "0.7.3"
+rand = "0.8.0"

@@ -7,4 +7,4 @@ authors = ["Christopher Shea <cmshea@gmail.com>"]
 clap = "2.33.3"
 png = "0.16.8"
 pnglitch-core = { path = "../pnglitch-core" }
-rand = "0.7.3"
+rand = "0.8.0"

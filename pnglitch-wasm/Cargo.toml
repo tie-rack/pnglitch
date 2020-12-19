@@ -13,12 +13,11 @@ crate-type = ["cdylib"]
 
 [dependencies]
 cfg-if = "1.0.0"
-js-sys = "0.3.46"
 wasm-bindgen = "0.2.69"
 png = "0.16.8"
 pnglitch-core = { path = "../pnglitch-core" }
-rand = "0.7.3"
-rand_hc = "0.2.0"
+getrandom = { version = "0.2", features = ["js"] }
+rand = "0.8.0"
 
 # The `console_error_panic_hook` crate provides better debugging of panics by
 # logging them with `console.error`. This is great for development, but requires
