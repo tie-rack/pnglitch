@@ -1,3 +1,8 @@
+//! # PNGlitch Core
+//!
+//! This crate provides the image glitching functionality for all the
+//! PNGlitch projects.
+
 pub mod effects;
 use effects::Glitch;
 
@@ -7,6 +12,11 @@ extern crate rand;
 use rand::distributions::{Distribution, Uniform};
 use rand::Rng;
 
+/// Glitch options
+///
+/// For each effect, determines how likely it is to be applied to a
+/// chunk (0.0–1.0). For `min_glitches` and `max_glitches`, the range
+/// of how many chunks will be glitched.
 pub struct GlitchOptions {
     pub min_glitches: u32,
     pub max_glitches: u32,
@@ -41,6 +51,12 @@ impl Default for GlitchOptions {
     }
 }
 
+/// Glitch image data
+///
+/// You provide the PNG's `OutputInfo`, its bytes, a random number
+/// generator, and some `GlitchOptions`. It will mess with the bytes,
+/// which you can then write out to a new PNG file or otherwise
+/// display.
 pub fn glitch(
     png_info: &png::OutputInfo,
     pixel_buf: &mut [u8],

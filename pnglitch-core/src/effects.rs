@@ -1,9 +1,15 @@
 use std::ops::BitXor;
 
+/// Glitch
+///
+/// A `Glitch` is something that mutates a collection of bytes.
 pub trait Glitch {
     fn run(&self, &mut [u8]);
 }
 
+/// Chunk glitches
+///
+/// Chunk glitches mutate a whole chunk as a whole.
 pub enum ChunkGlitch {
     ChannelSwap(usize, usize, usize),
     Darken,
@@ -14,6 +20,9 @@ pub enum ChunkGlitch {
     XOR(u8),
 }
 
+/// Line glitches
+///
+/// Line glitches do their operations line by line within a chunk.
 pub enum LineGlitch {
     ChannelShift(usize, usize, usize),
     Reverse,
