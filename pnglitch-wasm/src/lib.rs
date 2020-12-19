@@ -1,3 +1,7 @@
+//! PNGlitch WASM
+//!
+//! A Web Assembly interface for PNGlitch.
+
 #[macro_use]
 extern crate cfg_if;
 extern crate wasm_bindgen;
@@ -34,6 +38,11 @@ cfg_if! {
     }
 }
 
+/// Options
+///
+/// An interface and container for
+/// `pnglitch_core::GlitchOptions`. Each option has a getter and
+/// setter function, so that JavaScript can read and set those values.
 #[wasm_bindgen]
 pub struct Options(GlitchOptions);
 
@@ -118,6 +127,10 @@ impl Options {
     }
 }
 
+/// Glitch some PNG data
+///
+/// Decodes the PNG image, glitches the iamge with the options
+/// provided, and returns a buffer containing a new PNG image.
 #[wasm_bindgen]
 pub fn pnglitch(png: &[u8], options: &Options) -> Result<Vec<u8>, JsValue> {
     set_panic_hook();
