@@ -5,6 +5,17 @@
 PNGlitch is a library, command line tool, and website for applying
 random effects to PNG images.
 
+## Example
+
+Here's [Clara Peeter's _A Bouquet of Flowers_][boquet] and some images
+generated with `pnglitch-cli` combined into a gif.
+
+![Original][boquet-original] ![Glitched][boquet-glitched]
+
+[boquet]: https://www.metmuseum.org/art/collection/search/827660
+[boquet-original]: examples/Clara_Peeters-A_Boquet_of_Flowers.png
+[boquet-glitched]: examples/Clara_Peeters-A_Boquet_of_Flowers.gif
+
 ## The pieces
 
 ### `pnglitch-core`
